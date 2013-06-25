@@ -18,7 +18,7 @@ type Outing struct {
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	b, err := ioutil.ReadFile("index.html")
+	b, err := ioutil.ReadFile("templates/index.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -31,5 +31,6 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler)
 	http.Handle("/", r)
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 	http.ListenAndServe(":8080", nil)
 }
