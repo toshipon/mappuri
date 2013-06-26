@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"html/template"
 	"io/ioutil"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -59,7 +60,8 @@ func OutingHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(outing)
+	t, _ := template.ParseFiles("templates/outing_detail.html")
+	t.Execute(w, outing)
 }
 
 func main() {
