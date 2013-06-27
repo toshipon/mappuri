@@ -4,13 +4,17 @@
     <title>Outing details</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
-    <link href="../static/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
   </head>
   <div class="container">
     <body>
       <h1>{{.Name}} outing details</h1>
-
-      <script src="../static/bootstrap/js/bootstrap.min.js"></script>
+      <ul>
+      {{range .Places}}
+      <li>{{.Name}}: {{.MapLink}} {{.FoursquareLink}} {{.Website}} </li>
+      {{end}}
+      </ul>
+      <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
     </body>
   </div>
 </html>
