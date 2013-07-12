@@ -1,14 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/pat"
 	"github.com/gorilla/schema"
-	"html/template"
-	"io/ioutil"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
-	"log"
 	"net/http"
 	"net/url"
 )
@@ -29,16 +27,6 @@ type Outing struct {
 	Id     bson.ObjectId `bson:"_id"`
 	Name   string
 	Places []Place
-}
-
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	b, err := ioutil.ReadFile("templates/index.html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	}
-	fmt.Fprint(w, string(b))
-	return
 }
 
 func loadOuting(outingId string) (*Outing, error) {
@@ -71,39 +59,55 @@ func loadOutings() (*[]Outing, error) {
 	return &outings, nil
 }
 
-func showOuting(w http.ResponseWriter, r *http.Request) {
+func getResponse(w http.ResponseWriter, JSON string) {
+
+func getOuting(w http.ResponseWriter, r *http.Request) {
 	outingId := r.URL.Query().Get(":outingId")
 	outing, err := loadOuting(outingId)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	t, _ := template.ParseFiles("templates/outing_detail.html")
-	t.Execute(w, outing)
+	j, err := json.Marshal(outing)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	fmt.Fprint(w, string(j))
 }
 
-func listOutings(w http.ResponseWriter, r *http.Request) {
-	outing, err := loadOutings()
+func getOutings(w http.ResponseWriter, r *http.Request) {
+	outings, err := loadOutings()
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	t, _ := template.ParseFiles("templates/outing_detail.html")
-	t.Execute(w, outing)
+	j, err := json.Marshal(outings)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	fmt.Fprint(w, string(j))
 }
 
 func createOuting(w http.ResponseWriter, r *http.Request) {
-    outing := Outing{}
+	outing := Outing{}
 	r.ParseForm()
-	decoder.Decode(outing, r.PostForm)
+	err := decoder.Decode(outing, r.PostForm)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	fmt.Println(outing)
 }
 
 func main() {
 	r := pat.New()
-	r.Get("/", HomeHandler)
-	r.Get("/outings/{outingId}", http.HandlerFunc(showOuting))
-	r.Get("/outings", http.HandlerFunc(listOutings))
+	r.Get("/outings/{outingId}", http.HandlerFunc(getOuting))
+	r.Get("/outings", http.HandlerFunc(getOutings))
 	r.Post("/outings", http.HandlerFunc(createOuting))
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 	http.Handle("/", r)
 	http.ListenAndServe(":8080", nil)
 }
