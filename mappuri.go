@@ -59,8 +59,6 @@ func loadOutings() (*[]Outing, error) {
 	return &outings, nil
 }
 
-func getResponse(w http.ResponseWriter, JSON string) {
-
 func getOuting(w http.ResponseWriter, r *http.Request) {
 	outingId := r.URL.Query().Get(":outingId")
 	outing, err := loadOuting(outingId)
