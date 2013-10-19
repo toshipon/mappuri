@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/schema"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -107,5 +108,6 @@ func main() {
 	r.Get("/outings", http.HandlerFunc(getOutings))
 	r.Post("/outings", http.HandlerFunc(createOuting))
 	http.Handle("/", r)
-	http.ListenAndServe(":8080", nil)
+	fmt.Println("Running on localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
