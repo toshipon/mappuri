@@ -60,7 +60,7 @@ func loadOutings() (*[]Outing, error) {
 	return &outings, nil
 }
 
-func getOuting(w http.ResponseWriter, r *http.Request) {
+func GetOutingHandler(w http.ResponseWriter, r *http.Request) {
 	outingId := r.URL.Query().Get(":outingId")
 	outing, err := loadOuting(outingId)
 	if err != nil {
@@ -76,7 +76,7 @@ func getOuting(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(j))
 }
 
-func getOutings(w http.ResponseWriter, r *http.Request) {
+func GetOutingsHandler(w http.ResponseWriter, r *http.Request) {
 	outings, err := loadOutings()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -91,8 +91,8 @@ func getOutings(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(j))
 }
 
-func createOuting(w http.ResponseWriter, r *http.Request) {
-	outing := Outing{}
+func CreateOutingHandler(w http.ResponseWriter, r *http.Request) {
+	outing := new(Outing)
 	r.ParseForm()
 	err := decoder.Decode(outing, r.PostForm)
 	if err != nil {
@@ -104,9 +104,9 @@ func createOuting(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	r := pat.New()
-	r.Get("/outings/{outingId}", http.HandlerFunc(getOuting))
-	r.Get("/outings", http.HandlerFunc(getOutings))
-	r.Post("/outings", http.HandlerFunc(createOuting))
+	r.Get("/outings/{outingId}", http.HandlerFunc(GetOutingHandler))
+	r.Get("/outings", http.HandlerFunc(GetOutingsHandler))
+	r.Post("/outings", http.HandlerFunc(CreateOutingHandler))
 	http.Handle("/", r)
 	fmt.Println("Running on localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
