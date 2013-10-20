@@ -92,14 +92,34 @@ func GetOutingsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateOutingHandler(w http.ResponseWriter, r *http.Request) {
-	outing := new(Outing)
-	r.ParseForm()
-	err := decoder.Decode(outing, r.PostForm)
+	sess, err := mgo.Dial(mongoDbUrl)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
 	}
-	fmt.Println(outing)
+	defer sess.Close()
+	outing := new(Outing)
+	r.ParseForm()
+	err = decoder.Decode(outing, r.PostForm)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	outing.Id = bson.NewObjectId()
+	collection := sess.DB("mappuri").C("outings")
+	err = collection.Insert(outing)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	log.Println("Added outing: ", outing)
+}
+
+func CreatePlaceHandler(w http.ResponseWriter, r *http.Request) {
+	place := new(Place)
+	r.ParseForm()
+	err := decoder.Decode(place, r.PostForm)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	fmt.Println(place)
 }
 
 func main() {
@@ -107,6 +127,7 @@ func main() {
 	r.Get("/outings/{outingId}", http.HandlerFunc(GetOutingHandler))
 	r.Get("/outings", http.HandlerFunc(GetOutingsHandler))
 	r.Post("/outings", http.HandlerFunc(CreateOutingHandler))
+	r.Post("/places", http.HandlerFunc(CreatePlaceHandler))
 	http.Handle("/", r)
 	fmt.Println("Running on localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
