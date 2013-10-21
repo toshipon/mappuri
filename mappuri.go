@@ -17,11 +17,10 @@ const mongoDbUrl = "localhost"
 var decoder = schema.NewDecoder()
 
 type Place struct {
-	Id             bson.ObjectId `bson:"_id"`
 	Name           string
-	MapLink        *url.URL `bson:",omitempty"`
-	FoursquareLink *url.URL `bson:",omitempty"`
-	Website        *url.URL `bson:",omitempty"`
+	MapLink        *url.URL
+	FoursquareLink *url.URL
+	Website        *url.URL
 }
 
 type Outing struct {
