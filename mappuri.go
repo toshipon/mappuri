@@ -112,13 +112,33 @@ func CreateOutingHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreatePlaceHandler(w http.ResponseWriter, r *http.Request) {
+	sess, err := mgo.Dial(mongoDbUrl)
 	place := new(Place)
 	r.ParseForm()
-	err := decoder.Decode(place, r.PostForm)
+	outingId := r.FormValue("outingId")
+	outing, err := loadOuting(outingId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	fmt.Println(place)
+	Name := r.FormValue("Name")
+	MapLink, err := url.Parse(r.FormValue("MapLink"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	FoursquareLink, err := url.Parse(r.FormValue("FoursquareLink"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	place.Name = Name
+	place.MapLink = MapLink
+	place.FoursquareLink = FoursquareLink
+	collection := sess.DB("mappuri").C("outings")
+	outing.Places = append(outing.Places, *place)
+	err = collection.UpdateId(bson.ObjectIdHex(outingId), &outing)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func main() {
