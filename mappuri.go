@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"github.com/gorilla/pat"
 	"github.com/gorilla/schema"
@@ -14,7 +15,10 @@ import (
 
 const mongoDbUrl = "localhost"
 
-var decoder = schema.NewDecoder()
+var (
+	decoder = schema.NewDecoder()
+	port    = flag.String("p", "8000", "Port number (default 8000)")
+)
 
 type Place struct {
 	Name           string
@@ -148,6 +152,6 @@ func main() {
 	r.Post("/outings", http.HandlerFunc(CreateOutingHandler))
 	r.Post("/places", http.HandlerFunc(CreatePlaceHandler))
 	http.Handle("/", r)
-	fmt.Println("Running on localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	fmt.Println("Running on localhost:" + *port)
+	log.Fatal(http.ListenAndServe(":"+*port, nil))
 }
