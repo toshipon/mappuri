@@ -112,7 +112,6 @@ func CreateOutingHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	log.Println("Added outing: ", outing)
 }
 
 func CreatePlaceHandler(w http.ResponseWriter, r *http.Request) {
@@ -123,15 +122,18 @@ func CreatePlaceHandler(w http.ResponseWriter, r *http.Request) {
 	outing, err := loadOuting(outingId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	Name := r.FormValue("Name")
 	MapLink, err := url.Parse(r.FormValue("MapLink"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	FoursquareLink, err := url.Parse(r.FormValue("FoursquareLink"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	place.Name = Name
 	place.MapLink = MapLink
@@ -140,8 +142,8 @@ func CreatePlaceHandler(w http.ResponseWriter, r *http.Request) {
 	outing.Places = append(outing.Places, *place)
 	err = collection.UpdateId(bson.ObjectIdHex(outingId), &outing)
 	if err != nil {
-		fmt.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 
