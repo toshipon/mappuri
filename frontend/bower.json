@@ -1,20 +1,22 @@
 {
-  "name": "chaplin-boilerplate",
+  "name": "example-app",
   "version": "0.1.0",
-  "main": "index.js",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
+  "main": "public/javascripts/app.js",
   "dependencies": {
-    "requirejs": "~2.1.9",
-    "chaplin": "~0.11.3",
+    "chaplin": "~0.11.0",
+    "console-polyfill": "~0.1.0",
     "lodash": "~2.0.0",
-    "jquery": "~1.10.1",
-    "requirejs-text": "~2.0.9",
-    "handlebars": "~1.0.0"
+    "jquery": "~2.0.2",
+    "normalize-css": "~2.1.2",
+    "h5bp-helpers": "~0.1.0"
+  },
+  "overrides": {
+    "backbone": {
+      "dependencies": {
+        "lodash": "*",
+        "jquery": "*"
+      },
+      "main": "backbone.js"
+    }
   }
 }
