@@ -7,6 +7,7 @@ module.exports = class Application extends Chaplin.Application
     # (by calling `super`) after that.
     super
     @initMediator()
+    Chaplin.mediator.outingCollection.fetch()
 
   initMediator: ->
     Chaplin.mediator.outingCollection = new OutingCollection

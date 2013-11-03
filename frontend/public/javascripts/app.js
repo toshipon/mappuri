@@ -107,7 +107,8 @@ module.exports = Application = (function(_super) {
 
   Application.prototype.start = function() {
     Application.__super__.start.apply(this, arguments);
-    return this.initMediator();
+    this.initMediator();
+    return Chaplin.mediator.outingCollection.fetch();
   };
 
   Application.prototype.initMediator = function() {
@@ -307,6 +308,11 @@ module.exports = OutingCollection = (function(_super) {
 
   OutingCollection.prototype.url = 'outings';
 
+  OutingCollection.prototype.sync = function() {
+    OutingCollection.__super__.sync.apply(this, arguments);
+    return this.publishEvent('home#render');
+  };
+
   return OutingCollection;
 
 })(Collection);
@@ -441,7 +447,7 @@ module.exports = HomePageView = (function(_super) {
     HomePageView.__super__.initialize.apply(this, arguments);
     this.delegate('click', '.reload-btn', this.clickReloadBtn);
     this.delegate('submit', '#outing-form', this.submitOuting);
-    return Chaplin.mediator.outingCollection.fetch();
+    return this.subscribeEvent('home#render', this.render);
   };
 
   HomePageView.prototype.render = function() {

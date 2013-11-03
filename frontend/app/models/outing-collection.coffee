@@ -4,3 +4,7 @@ Outing = require 'models/outing'
 module.exports = class OutingCollection extends Collection
     model: Outing
     url: 'outings'
+
+    sync: ->
+        super
+        @publishEvent 'home#render'

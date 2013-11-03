@@ -10,7 +10,7 @@ module.exports = class HomePageView extends View
     super
     @delegate 'click', '.reload-btn', @clickReloadBtn
     @delegate 'submit','#outing-form', @submitOuting
-    Chaplin.mediator.outingCollection.fetch()
+    @subscribeEvent 'home#render', @render
 
   render: ->
     super
