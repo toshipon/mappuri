@@ -3,10 +3,10 @@ define(['chaplin'], function(Chaplin) {
 
   // The application object
   // Choose a meaningful name for your application
-  var Application = Chaplin.Application.extend({
+  var Mappuri = Chaplin.Application.extend({
     // Set your application name here so the document title is set to
     // “Controller title – Site title” (see Layout#adjustTitle)
-    title: 'Chaplin Example Application',
+    title: 'Mappuri',
     start: function() {
       // You can fetch some data here and start app
       // (by calling supermethod) after that.
@@ -14,5 +14,5 @@ define(['chaplin'], function(Chaplin) {
     }
   });
 
-  return Application;
+  return Mappuri;
 });
