@@ -189,6 +189,16 @@ Application = require('application');
 
 routes = require('routes');
 
+$.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+  options.url = 'http://localhost:8000/' + options.url;
+  options.crossDomain = {
+    crossDomain: true
+  };
+  return options.xhrFields = {
+    withCredentials: true
+  };
+});
+
 $(function() {
   return new Application({
     title: 'Brunch example application',
@@ -263,6 +273,11 @@ module.exports = Collection = (function(_super) {
   }
 
   Collection.prototype.model = Model;
+
+  Collection.prototype.sync = function(method, model, options) {
+    options.dataType = 'jsonp';
+    return Collection.__super__.sync.apply(this, arguments);
+  };
 
   return Collection;
 

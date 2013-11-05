@@ -11,7 +11,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"html/template"
 )
 
 const mongoDbUrl = "localhost"
@@ -91,8 +90,9 @@ func GetOutingsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(j))
+	callback := r.URL.Query().Get("callback")
+	w.Header().Set("Content-Type", "application/jsonp; charset=utf-8")
+	fmt.Fprint(w, callback + "(" + string(j) + ")")
 }
 
 func CreateOutingHandler(w http.ResponseWriter, r *http.Request) {
@@ -148,56 +148,12 @@ func CreatePlaceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	// Create and parse Template
-	t, err := template.New("index.html").ParseFiles("frontend/public/index.html")
-	if err != nil {
-		log.Panic(err)
-	}
-	// Render the template
-	err = t.Execute(w, map[string]interface{}{})
-	if err != nil {
-		log.Panic(err)
-	}
-}
-
-type ResponseWriterProxy struct {
-	realResponseWriter	*http.ResponseWriter
-	code			int
-}
-
-func (rwp *ResponseWriterProxy) Header() http.Header {
-	return (*rwp.realResponseWriter).Header()
-}
-
-func (rwp *ResponseWriterProxy) Write(buf []byte) (int, error) {
-	return (*rwp.realResponseWriter).Write(buf)
-}
-
-func (rwp *ResponseWriterProxy) WriteHeader(code int) {
-	(*rwp.realResponseWriter).WriteHeader(code)
-	rwp.code = code
-}
-
-func maxAgeHandler(seconds int, h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		responseWriterProxy := &ResponseWriterProxy{realResponseWriter: &w}
-		h.ServeHTTP(responseWriterProxy, r)
-		if responseWriterProxy.code == 200 {	//only cache the response if it's successful
-			w.Header().Add("Cache-Control", fmt.Sprintf("max-age=%d, public, must-revalidate, proxy-revalidate", seconds))
-		}
-
-	})
-}
-
 func main() {
 	r := pat.New()
 	r.Get("/outings/{outingId}", http.HandlerFunc(GetOutingHandler))
 	r.Get("/outings", http.HandlerFunc(GetOutingsHandler))
 	r.Post("/outings", http.HandlerFunc(CreateOutingHandler))
 	r.Post("/places", http.HandlerFunc(CreatePlaceHandler))
-	r.HandleFunc("/", HomeHandler)
-	http.Handle("/assets/", maxAgeHandler(10*365*24*60*60, http.StripPrefix("/assets/", http.FileServer(http.Dir("frontend/public/")))))
 	http.Handle("/", r)
 	fmt.Println("Running on localhost:" + *port)
 	log.Fatal(http.ListenAndServe(":"+*port, nil))
