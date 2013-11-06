@@ -90,9 +90,8 @@ func GetOutingsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	callback := r.URL.Query().Get("callback")
-	w.Header().Set("Content-Type", "application/jsonp; charset=utf-8")
-	fmt.Fprint(w, callback + "(" + string(j) + ")")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	fmt.Fprint(w, string(j))
 }
 
 func CreateOutingHandler(w http.ResponseWriter, r *http.Request) {
